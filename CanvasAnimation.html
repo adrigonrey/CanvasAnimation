@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <title>Particle System</title>
+ <meta charset="utf-8">
+ <style>
+canvas {
+ border: 1px solid black;;
+}
+</style>
+ <script>
+ var canvas;
+ var context;
+ var particles =[];
+ var timer;
+
+function makeTitle() {
+	//generate the title for your masterpiece
+	var lines = ['Love me', 'or', 'hate me', 'but you cant', 'ignore me'];
+	
+	var title = '';
+	
+	for (var i=0; i<lines.length; i++) {
+		title += lines[i] + ' '; //because it's a loop we need to add an empty string
+	}
+	return(title);	
+}
+
+function makeParticles() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+		fillBackgroundColor();
+		for (var i=0; i<30; i++) {
+			particles.push(new Particle());
+		 }
+ }
+
+function fillBackgroundColor() {
+		 //var colors = ["white", "yellow", "blue", "red"];
+		 //var bgColor = colors[Math.floor(Math.random() * colors.length)];
+		 context.fillStyle = 'pink';
+		 context.fillRect(0, 0, canvas.width, canvas.height);
+}
+function artHandler(){
+
+    var title = makeTitle();
+	
+	var canvas = document.getElementById('canvas');
+	var context = canvas.getContext('2d');
+	drawText(canvas, context, title);
+}
+
+function Particle(){
+	 //the constructor for a single particle, with random starting x+y, velocity, color, and radius
+	 this.x = Math.random()*canvas.width;
+	 this.y = Math.random()*canvas.height;
+	 this.dx = Math.random()*30-20;
+	 this.dy = Math.random()*30-20;
+	 var colors = ["red", "green", "blue", "orange", "purple", "yellow", "white"];
+	 this.color = colors[Math.floor(Math.random()*colors.length)];
+	 this.radius = 15;
+	 this.width = 20;
+	 this.height = 15;
+ }
+
+function drawCircle(particle) {
+		 context.beginPath();
+		 context.arc(particle.x, particle.y, particle.radius, 0, degreesToRadians(360), true);
+		 context.fillStyle = particle.color;
+		 context.fill();
+		 if (particle.x + particle.dx > canvas.width || particle.x + particle.dx < 0)
+			particle.dx = -particle.dx;
+		 if (particle.y + particle.dy > canvas.height || particle.y + particle.dy < 0)
+			particle.dy = -particle.dy;
+		 particle.x += particle.dx;
+		 particle.y += particle.dy;
+}
+function degreesToRadians(degrees) {
+		//converts from degrees to radians and returns
+		return (degrees * Math.PI)/180;
+}
+
+function drawRect(particle) {
+
+	context.beginPath();
+      context.rect(particle.x, particle.y, particle.width, particle.height);
+      context.fillStyle = particle.color;
+      context.fill();
+      if (particle.x + particle.dx > canvas.width || particle.x + particle.dx < 0)
+			particle.dx = -particle.dx;
+		 if (particle.y + particle.dy > canvas.height || particle.y + particle.dy < 0)
+			particle.dy = -particle.dy;
+		 particle.x += particle.dx;
+		 particle.y += particle.dy;
+}
+function drawSemi(particle) {
+	context.beginPath();
+      context.arc(particle.x, particle.y, particle.radius, 0, Math.PI, false);
+      context.closePath();
+      context.lineWidth = 5;
+      context.fillStyle = particle.color;
+      context.fill();
+
+}
+
+function drawTriangle(particle){
+	context.beginPath();
+    context.moveTo(particle.x, particle.y);
+    context.lineTo(particle.x + 10,particle.y +8);
+    context.lineTo(particle.x + 10, particle.y -8);
+    context.closePath();
+    context.fillStyle = particle.color;
+    context.fill();
+
+}
+function moveParticles() {
+	 //partially clear the screen to fade previous circles, and draw a new particle at each new coordinate
+	 context.globalCompositeOperation = "source-over";
+	 context.fillStyle = "pink";
+	 context.fillRect(0, 0, canvas.width, canvas.height);
+	 var shapes = ['circle', 'rectangle', 'semi circle', 'triangle'];
+	 for(var i = 0; i < particles.length; i++)
+	 {
+		var shape = shapes[Math.floor(Math.random() * shapes.length)];
+		
+		if (shape == 'circle') {
+		    drawCircle(particles[i]);
+		}
+		else if(shape == 'rectangle'){
+            drawRect(particles[i]);		
+		} 
+		else if (shape == 'semi circle'){
+			drawSemi(particles[i]);
+		}
+		else {
+			drawTriangle(particles[i]);
+		}
+	 }
+}
+function drawText(canvas, context,title) {
+    context.fillStyle = '#ff8080';
+	context.font = '2em helvetica';
+	context.textAlign = 'center';
+	context.fillText(title, canvas.width/2, canvas.height/2);
+}
+
+window.onload = function() {
+ 	 canvas = document.getElementById('canvas');
+	 context = canvas.getContext('2d');
+	 makeParticles();
+	 timer = setInterval(moveParticles, 200);
+	  var button = document.getElementById('artButton');
+	  timerArt = setInterval(artHandler,1000);
+}
+</script>
+</head>
+<body>
+		<canvas id="canvas" width="1000" height="550"></canvas>
+<form>
+
+</form>
+</body>
+</html>
