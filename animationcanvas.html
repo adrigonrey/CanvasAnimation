@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<title>Responsive Interactive Canvas</title>
+ <script>
+
+var canvas;
+var context;
+var shapes = []
+var timer;
+var timerTwo;
+var possibleShapes = ['semicircle','triangle','rectangle','circle','heart'];
+
+function Shape(x, y, color) {
+	this.x = x;
+	this.y = y;
+	this.dx = Math.random()*30-20;
+	this.dy = Math.random()*30-20;
+	this.color = color;
+	this.shape = possibleShapes[Math.floor(Math.random()*possibleShapes.length)];
+	this.radius = 15;
+	this.width = 20;
+	this.height = 15;
+ }
+
+function makeTitle(i) {
+    context.fillStyle = 'white';
+	context.font = '2em helvetica';
+	context.textAlign = 'center';
+	var lines = ['Love me', 'or', 'hate me', 'but you', "CAN'T",'ignore me'];		
+	context.fillText(lines[i], canvas.width/2, canvas.height/3 + i*50);
+}
+
+function newShape() {
+		var x = Math.random() * canvas.width;
+		var y = Math.random() * canvas.height;
+		var colors = ["red", "green", "blue", "orange", "purple", "yellow"];
+		var color = colors[Math.floor(Math.random()*colors.length)];
+		shapes.push(new Shape(x, y, color));
+ }
+ function init() {
+        canvas = document.getElementById('canvas');
+        context = canvas.getContext("2d");
+ 
+        window.addEventListener('resize', resizeCanvas, false);
+        window.addEventListener('orientationchange', resizeCanvas, false);
+        resizeCanvas();
+		canvas.onclick = function(event) {
+			handleClick(event.clientX, event.clientY);
+		};
+		timer = setInterval(resizeCanvas, 40);
+		timerTwo = setInterval(newShape, 1000);
+      }
+
+function fillBackgroundColor() {
+		 //var colors = ["white", "yellow", "blue", "red"];
+		 //var bgColor = colors[Math.floor(Math.random() * colors.length)];
+		 context.fillStyle = 'pink';
+		 context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawCircle(circle) {
+		 context.beginPath();
+		 context.arc(circle.x, circle.y, circle.radius, 0, degreesToRadians(360), true);
+		 context.fillStyle = circle.color;
+		 context.fill();
+		 if (circle.x + circle.dx > canvas.width || circle.x + circle.dx < 0)
+			circle.dx = -circle.dx;
+		 if (circle.y + circle.dy > canvas.height || circle.y + circle.dy < 0)
+			circle.dy = -circle.dy;
+		 circle.x += circle.dx;
+		 circle.y += circle.dy;
+}
+function degreesToRadians(degrees) {
+		//converts from degrees to radians and returns
+		return (degrees * Math.PI)/180;
+}
+
+function drawRect(rectangle) {
+	context.beginPath();
+    context.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    context.fillStyle = rectangle.color;
+    context.fill();
+    if (rectangle.x + rectangle.dx > canvas.width || rectangle.x + rectangle.dx < 0)
+		rectangle.dx = -rectangle.dx;
+	if (rectangle.y + rectangle.dy > canvas.height || rectangle.y + rectangle.dy < 0)
+		rectangle.dy = -rectangle.dy;
+		rectangle.x += rectangle.dx;
+		rectangle.y += rectangle.dy;
+}
+function drawSemi(semicircle) {
+	context.beginPath();
+      context.arc(semicircle.x, semicircle.y, semicircle.radius, 0, Math.PI, false);
+      context.closePath();
+      context.lineWidth = 5;
+      context.fillStyle = semicircle.color;
+      context.fill();
+    if (semicircle.x + semicircle.dx > canvas.width || semicircle.x + semicircle.dx < 0)
+		semicircle.dx = -semicircle.dx;
+	if (semicircle.y + semicircle.dy > canvas.height || semicircle.y + semicircle.dy < 0)
+		semicircle.dy = -semicircle.dy;
+		semicircle.x += semicircle.dx;
+		semicircle.y += semicircle.dy;
+
+}
+
+function drawTriangle(triangle){
+	context.beginPath();
+    context.moveTo(triangle.x, triangle.y);
+    context.lineTo(triangle.x + 15, triangle.y +12);
+    context.lineTo(triangle.x + 15, triangle.y -12);
+    context.closePath();
+    context.fillStyle = triangle.color;
+    context.fill();
+    if (triangle.x + triangle.dx > canvas.width || triangle.x + triangle.dx < 0)
+		triangle.dx = -triangle.dx;
+	if (triangle.y + triangle.dy > canvas.height || triangle.y + triangle.dy < 0)
+		triangle.dy = -triangle.dy;
+		triangle.x += triangle.dx;
+		triangle.y += triangle.dy;
+}
+ function drawHeart(heart){
+context.beginPath();
+context.moveTo(heart.x, heart.y); 
+context.bezierCurveTo(heart.x, heart.y-3, heart.x-5, heart.y-15, heart.x-25, heart.y-15);
+context.bezierCurveTo(heart.x-55, heart.y-15, heart.x-55, heart.y+22.5, heart.x-55, heart.y+22.5);
+context.bezierCurveTo(heart.x-55, heart.y+40, heart.x-35, heart.y+62, heart.x, heart.y+80);
+context.bezierCurveTo(heart.x+35, heart.y+62, heart.x+55, heart.y+40, heart.x+55, heart.y+22.5);
+context.bezierCurveTo(heart.x+55, heart.y+22.5, heart.x+55, heart.y-15, heart.x+25, heart.y-15);
+context.bezierCurveTo(heart.x+10, heart.y-15, heart.x, heart.y-3, heart.x, heart.y);
+context.fillStyle = heart.color;
+context.fill();
+    if (heart.x + heart.dx > canvas.width || heart.x + heart.dx < 0)
+		heart.dx = -heart.dx;
+	if (heart.y + heart.dy > canvas.height || heart.y + heart.dy < 0)
+		heart.dy = -heart.dy;
+		heart.x += heart.dx;
+		heart.y += heart.dy;
+}
+function resizeCanvas() {
+    canvas.width = window.innerWidth-20;
+    canvas.height = window.innerHeight-20;
+	fillBackgroundColor();
+	for (var i=0; i<shapes.length; i++) {
+		if(i<6)
+		makeTitle(i);
+		if (shapes[i].shape == 'rectangle') {
+			drawRect(shapes[i]);
+		} else if (shapes[i].shape == 'circle') {
+			drawCircle(shapes[i]);
+		} else if (shapes[i].shape == 'triangle') {
+			drawTriangle(shapes[i]);
+		} else if (shapes[i].shape == 'semicircle') {
+			drawSemi(shapes[i]);
+		} else if (shapes[i].shape == 'heart') {
+			drawHeart(shapes[i]);
+		}
+	} 
+}
+function drawText2(title) {
+    context.fillStyle = 'white';
+	context.font = '2em helvetica';
+	context.textAlign = 'center';
+}
+
+window.onload = init;
+</script>
+</head>
+<body>
+		<canvas id="canvas" width="1000" height="550"></canvas>
+</body>
+</html>
