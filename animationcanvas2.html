@@ -69,16 +69,11 @@ function handleClick(x, y) {
 				shapes.splice(i, 1);
 				found = true;
 			}
-			else if(shapes[i].shape == "pill" && shapes[i].color == "blue"){
+			else if((shapes[i].color == "blue") && (shapes[i].shape == "pill")){
 				clearInterval(timerTwo);
 				clearInterval(timer);
-				pillfound=true;
+				pillfound = true;
 				alert("You are out of the matrix");
-			}
-		 if (!found) {
-			var colors = ["red", "blue"];
-			var color = colors[Math.floor(Math.random()*colors.length)];
-			shapes.push(new Shape(x, y, color));
 			}
 		}	
 }
