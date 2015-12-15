@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+<head>
+<title>Responsive Interactive Canvas</title>
+<style>
+body{
+	background: url(https://img.4plebs.org/boards/x/image/1436/83/1436836209314.gif) top left fixed repeat;
+
+}
+</style>
+ <script>
+
+var canvas;
+var context;
+var shapes = []
+var timer;
+var timerTwo;
+var possibleShapes = ['pill','triangle','rectangle','circle','heart'];
+
+
+function Shape(x, y, color) {
+	this.x = x;
+	this.y = y;
+	this.dx = Math.random()*30-20;
+	this.dy = Math.random()*30-20;
+	this.color = color;
+	this.shape = possibleShapes[Math.floor(Math.random()*possibleShapes.length)];
+	this.radius = 25;
+	this.width = 45;
+	this.height = 30;
+ }
+
+function makeTitle(i, text) {
+    context.fillStyle = 'white';
+	context.font = '2em helvetica';
+	context.textAlign = 'center';
+	text = document.getElementById('custom-text').value;
+	var lines = ['Wake up, '+ text, 'the matrix has you...', 'if you want to escape...', "click on the right shape","Do it", "before it's too late", "knock, knock, ", text];		
+	context.fillText(lines[i], canvas.width/2, canvas.height/3 + i*50);
+}
+
+function newShape() {
+		var x = Math.random() * canvas.width;
+		var y = Math.random() * canvas.height;
+		var colors = ["red","blue"];
+		var color = colors[Math.floor(Math.random()*colors.length)];
+		shapes.push(new Shape(x, y, color));
+ }
+ function init() {
+        canvas = document.getElementById('canvas');
+        context = canvas.getContext("2d");
+ 
+        window.addEventListener('resize', resizeCanvas, false);
+        window.addEventListener('orientationchange', resizeCanvas, false);
+        resizeCanvas();
+		canvas.onclick = function(event) {
+			handleClick(event.clientX, event.clientY);
+		};
+		timer = setInterval(resizeCanvas, 60);
+		timerTwo = setInterval(newShape, 2500);
+      }
+
+function handleClick(x, y) {
+	     var found = false;
+	     var pillfound= false;
+		 for (var i=0; i<shapes.length; i++) {
+			d = Math.sqrt((shapes[i].x - x)*(shapes[i].x - x) + (shapes[i].y - y)*(shapes[i].y - y));
+			if (d <= 60) {
+				shapes.splice(i, 1);
+				found = true;
+			}
+			else if(shapes[i].shape == "pill" && shapes[i].color == "blue"){
+				clearInterval(timerTwo);
+				clearInterval(timer);
+				pillfound=true;
+				alert("You are out of the matrix");
+			}
+		 if (!found) {
+			var colors = ["red", "blue"];
+			var color = colors[Math.floor(Math.random()*colors.length)];
+			shapes.push(new Shape(x, y, color));
+			}
+		}	
+}
+
+function drawCircle(circle) {
+		 context.beginPath();
+		 context.arc(circle.x, circle.y, circle.radius, 0, degreesToRadians(360), true);
+		 context.fillStyle = circle.color;
+		 context.fill();
+		 if (circle.x + circle.dx > canvas.width || circle.x + circle.dx < 0)
+			circle.dx = -circle.dx;
+		 if (circle.y + circle.dy > canvas.height || circle.y + circle.dy < 0)
+			circle.dy = -circle.dy;
+		 circle.x += circle.dx;
+		 circle.y += circle.dy;
+}
+function degreesToRadians(degrees) {
+		//converts from degrees to radians and returns
+		return (degrees * Math.PI)/180;
+}
+
+function drawRect(rectangle) {
+	context.beginPath();
+    context.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    context.fillStyle = rectangle.color;
+    context.fill();
+    if (rectangle.x + rectangle.dx > canvas.width || rectangle.x + rectangle.dx < 0)
+		rectangle.dx = -rectangle.dx;
+	if (rectangle.y + rectangle.dy > canvas.height || rectangle.y + rectangle.dy < 0)
+		rectangle.dy = -rectangle.dy;
+		rectangle.x += rectangle.dx;
+		rectangle.y += rectangle.dy;
+}
+function drawPill(pill) {
+        	var startAngle1 = Math.PI*0.5;
+        	var endAngle1 = Math.PI*1.5;
+        	var antiClockwise1 = false;
+ 
+        	var startAngle2 = Math.PI*1.5;
+        	var endAngle2 = Math.PI*0.5;
+        	var antiClockwise2 = false;
+ 
+        	context.beginPath();
+        	context.arc(pill.x, pill.y, pill.radius, startAngle1, endAngle1, antiClockwise1);
+        	context.lineTo(pill.x+50, pill.y- pill.radius);
+        	context.arc(pill.x+50, pill.y, pill.radius, startAngle2, endAngle2, antiClockwise2);
+        	context.closePath();
+        	context.fillStyle = pill.color;
+        	context.fill(); 
+
+    if (pill.x + pill.dx > canvas.width || pill.x + pill.dx < 0)
+		pill.dx = -pill.dx;
+	if (pill.y + pill.dy > canvas.height || pill.y + pill.dy < 0)
+		pill.dy = -pill.dy;
+		pill.x += pill.dx;
+		pill.y += pill.dy;
+
+}
+
+function drawTriangle(triangle){
+	context.beginPath();
+    context.moveTo(triangle.x, triangle.y);
+    context.lineTo(triangle.x + 35, triangle.y +32);
+    context.lineTo(triangle.x + 35, triangle.y -32);
+    context.closePath();
+    context.fillStyle = triangle.color;
+    context.fill();
+    if (triangle.x + triangle.dx > canvas.width || triangle.x + triangle.dx < 0)
+		triangle.dx = -triangle.dx;
+	if (triangle.y + triangle.dy > canvas.height || triangle.y + triangle.dy < 0)
+		triangle.dy = -triangle.dy;
+		triangle.x += triangle.dx;
+		triangle.y += triangle.dy;
+}
+ function drawHeart(heart){
+context.beginPath();
+context.moveTo(heart.x, heart.y); 
+context.bezierCurveTo(heart.x, heart.y-3, heart.x-5, heart.y-15, heart.x-25, heart.y-15);
+context.bezierCurveTo(heart.x-55, heart.y-15, heart.x-55, heart.y+22.5, heart.x-55, heart.y+22.5);
+context.bezierCurveTo(heart.x-55, heart.y+40, heart.x-35, heart.y+62, heart.x, heart.y+80);
+context.bezierCurveTo(heart.x+35, heart.y+62, heart.x+55, heart.y+40, heart.x+55, heart.y+22.5);
+context.bezierCurveTo(heart.x+55, heart.y+22.5, heart.x+55, heart.y-15, heart.x+25, heart.y-15);
+context.bezierCurveTo(heart.x+10, heart.y-15, heart.x, heart.y-3, heart.x, heart.y);
+context.fillStyle = heart.color;
+context.fill();
+    if (heart.x + heart.dx > canvas.width || heart.x + heart.dx < 0)
+		heart.dx = -heart.dx;
+	if (heart.y + heart.dy > canvas.height || heart.y + heart.dy < 0)
+		heart.dy = -heart.dy;
+		heart.x += heart.dx;
+		heart.y += heart.dy;
+}
+function resizeCanvas() {
+    canvas.width = window.innerWidth-20;
+    canvas.height = window.innerHeight-20;
+	for (var i=0; i<shapes.length; i++) {
+		if(i<8)
+		makeTitle(i);
+		if (shapes[i].shape == 'rectangle') {
+			drawRect(shapes[i]);
+		} else if (shapes[i].shape == 'circle') {
+			drawCircle(shapes[i]);
+		} else if (shapes[i].shape == 'triangle') {
+			drawTriangle(shapes[i]);
+		} else if (shapes[i].shape == 'pill') {
+			drawPill(shapes[i]);
+		} else if (shapes[i].shape == 'heart') {
+			drawHeart(shapes[i]);
+		}
+	}
+}
+
+</script>
+</head>
+<body>
+		<canvas id="canvas" width="1000" height="550"></canvas>
+		<span id="controls">
+		<input type='text' id="custom-text" value="What's your name?" onsubmit= "init()" style="width:80%"/><br />
+		<input type="submit" value="Enter" onclick= 'init()' />
+
+		</p>
+</body>
+</html>
